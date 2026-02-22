@@ -25,7 +25,6 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-// Restore page size from cookie or default to 10
 let recordsPerPage = parseInt(getCookie("pageSize")) || 10;
 
 async function fetchGames() {
@@ -123,6 +122,15 @@ document.getElementById("page-size-select").onchange = (e) => {
     fetchGames();
 };
 
+document.getElementById("search-input").oninput = () => {
+    currentPage = 1;
+    fetchGames();
+};
+
+document.getElementById("sort-select").onchange = () => {
+    currentPage = 1;
+    fetchGames();
+};
 addButton.onclick = () => modal.classList.remove("hidden");
 cancelButton.onclick = () => modal.classList.add("hidden");
 
@@ -131,7 +139,8 @@ form.onsubmit = async (e) => {
     const gameData = {
         title: document.getElementById("title").value.trim(),
         genre: document.getElementById("genre").value,
-        rating: Number(document.getElementById("rating").value)
+        rating: Number(document.getElementById("rating").value),
+        image_url: document.getElementById("image-url")?.value || ""
     };
     if (window.editedGameID) gameData.id = window.editedGameID;
     await fetch(API_URL, {

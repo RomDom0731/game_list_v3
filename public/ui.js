@@ -16,8 +16,7 @@ function renderList(games) {
     const tbl = document.createElement("table");
     const headerRow = tbl.insertRow();
     
-    //Changes format to have Genre as another row in the table
-    ["Title", "Genre", "Rating", "Actions"].forEach(text => {
+    ["Image", "Title", "Genre", "Rating", "Actions"].forEach(text => {
         const th = document.createElement("th");
         th.textContent = text;
         headerRow.appendChild(th);
@@ -25,6 +24,15 @@ function renderList(games) {
 
     games.forEach(game => {
         const row = tbl.insertRow();
+
+        const imgCell = row.insertCell();
+        const img = document.createElement("img");
+        img.src = game.image_url || 'https://placehold.co/100x130?text=No+Image';
+        img.style.width = "60px"; // Thumbnail size for table
+        img.style.borderRadius = "4px";
+        img.onerror = () => { img.src = 'https://placehold.co/100x130?text=Error'; };
+        imgCell.appendChild(img);
+        
         row.insertCell().textContent = game.title;
         row.insertCell().textContent = game.genre;
         row.insertCell().textContent = game.rating;
