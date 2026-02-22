@@ -11,6 +11,16 @@
 <header class="main-header">
   <h1>List of Played Games</h1>
   <div class="nav-controls">
+    <input type="text" id="search-input" placeholder="Search games...">
+    <select id="sort-select">
+        <option value="title">Sort by Title</option>
+        <option value="rating">Sort by Rating</option>
+    </select>
+    <select id="page-size-select">
+        <option value="5">5 per page</option>
+        <option value="10" selected>10 per page</option>
+        <option value="20">20 per page</option>
+    </select>
     <button id="add-game-button">Add Game</button>
     <button id="view-button">View Stats</button>
   </div>
