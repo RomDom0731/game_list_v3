@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy import or_, func, desc
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='public', static_url_path='')
 CORS(app)
 
 
@@ -21,6 +21,10 @@ class Game(db.Model):
     genre = db.Column(db.String(100), nullable=False)
     rating = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.Text)
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/api', methods=['GET'])
 def get_games():
