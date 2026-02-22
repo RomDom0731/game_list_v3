@@ -38,6 +38,8 @@ def get_games():
         Game.genre.ilike(f'%{search}%')
     ))
 
+    true_total = Game.query.count()
+
     global_avg_rating = db.session.query(func.avg(Game.rating)).scalar() or 0
 
     top_genre_row = db.session.query(
@@ -58,7 +60,8 @@ def get_games():
 
     return jsonify({
         "data": [{"id": g.id, "title": g.title, "genre": g.genre, "rating": g.rating, "image_url": g.image_url} for g in pagination.items],
-        "total": pagination.total,
+        "total": true_total,
+        "filteredTotal": pagination.total,
         "page": page,
         "totalPages": pagination.pages,
         "allGenres": genres_list,
