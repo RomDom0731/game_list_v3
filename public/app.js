@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5001/api";
+const API_URL = "https://gamelistapp.com/";
 let games = [];
 let currentPage = 1;
 
