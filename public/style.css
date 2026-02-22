@@ -261,6 +261,7 @@ td button:nth-of-type(2):hover {
 .stat-card.blue .stat-value { color: #1a73e8; }
 .stat-card.gold .stat-value { color: #f9ab00; }
 .stat-card.purple .stat-value { color: #9334e6; }
+.stat-card.red .stat-value { color: #d93025; }
 
 .stat-value::after {
     content: '';

@@ -3,14 +3,13 @@ import time
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from sqlalchemy import or_
+from sqlalchemy import or_, func, desc
 
 app = Flask(__name__)
 CORS(app)
 
 
 
-# REQUIREMENT: Use environment variables for secrets
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -25,7 +24,6 @@ class Game(db.Model):
 
 @app.route('/api', methods=['GET'])
 def get_games():
-    # REQUIREMENT: Configurable paging, searching, and sorting
     page = int(request.args.get('page', 1))
     limit = int(request.args.get('limit', 10))
     search = request.args.get('search', '')
@@ -35,6 +33,14 @@ def get_games():
         Game.title.ilike(f'%{search}%'),
         Game.genre.ilike(f'%{search}%')
     ))
+
+    global_avg_rating = db.session.query(func.avg(Game.rating)).scalar() or 0
+
+    top_genre_row = db.session.query(
+        Game.genre, func.count(Game.genre).label('cnt')
+    ).group_by(Game.genre).order_by(desc('cnt')).first()
+
+    global_top_genre = top_genre_row[0] if top_genre_row else "N/A"
 
     if sort_by == 'rating':
         query = query.order_by(Game.rating.desc())
@@ -51,7 +57,9 @@ def get_games():
         "total": pagination.total,
         "page": page,
         "totalPages": pagination.pages,
-        "allGenres": genres_list
+        "allGenres": genres_list,
+        "globalAvgRating": round(float(global_avg_rating), 1),
+        "globalTopGenre": global_top_genre
     })
 
 @app.route('/api', methods=['POST'])

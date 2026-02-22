@@ -42,7 +42,7 @@ async function fetchGames() {
         if (result && result.data){
             games = result.data; 
             renderList(result.data); 
-            renderStats(result.data, result.total);
+            renderStats(result.total, result.globalAvgRating, result.globalTopGenre);
             updatePaginationUI(result.page, result.totalPages);
             populateGenreDropdown(result.allGenres);
         }

@@ -54,36 +54,27 @@ function renderList(games) {
     container.appendChild(tbl);
 }
 
-function renderStats(games, totalCount) {
+function renderStats(totalCount, globalAvg, globalTop) {
     const statsContent = document.getElementById("stats-content");
-    const totalGames = totalCount || 0;
-
-    const avgRating = games.length > 0 
-        ? (games.reduce((sum, game) => sum + game.rating, 0) / games.length).toFixed(1) 
-        : "0.0";
-
-    let mostCommonGenre = "N/A";
-    if (totalGames > 0) {
-        const counts = games.reduce((acc, game) => {
-            acc[game.genre] = (acc[game.genre] || 0) + 1;
-            return acc;
-        }, {});
-        mostCommonGenre = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-    }
+    const pageSize = typeof recordsPerPage !== 'undefined' ? recordsPerPage : 10;
 
     statsContent.innerHTML = `
         <div class="stats-grid">
             <div class="stat-card blue">
-                <span class="stat-value">${totalGames}</span>
+                <span class="stat-value">${totalCount}</span>
                 <span class="stat-label">Total Games in Collection</span>
             </div>
             <div class="stat-card gold">
-                <span class="stat-value">${avgRating}</span>
+                <span class="stat-value">${globalAvg}</span>
                 <span class="stat-label">Average Rating</span>
             </div>
             <div class="stat-card purple">
-                <span class="stat-value">${mostCommonGenre}</span>
+                <span class="stat-value">${globalTop}</span>
                 <span class="stat-label">Most Played Genre</span>
+            </div>
+            <div class="stat-card red">
+                <span class="stat-value">${pageSize}</span>
+                <span class="stat-label">Current Page Size</span>
             </div>
         </div>
     `;
