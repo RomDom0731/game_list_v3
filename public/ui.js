@@ -30,9 +30,10 @@ function renderList(games) {
         img.src = game.image_url || 'https://placehold.co/100x130?text=No+Image';
         img.style.width = "60px"; // Thumbnail size for table
         img.style.borderRadius = "4px";
+        img.style.display = "block";
         img.onerror = () => { img.src = 'https://placehold.co/100x130?text=Error'; };
         imgCell.appendChild(img);
-        
+
         row.insertCell().textContent = game.title;
         row.insertCell().textContent = game.genre;
         row.insertCell().textContent = game.rating;
@@ -53,12 +54,12 @@ function renderList(games) {
     container.appendChild(tbl);
 }
 
-function renderStats(games) {
+function renderStats(games, totalCount) {
     const statsContent = document.getElementById("stats-content");
-    const totalGames = games.length;
+    const totalGames = totalCount || 0;
 
-    const avgRating = totalGames > 0 
-        ? (games.reduce((sum, game) => sum + game.rating, 0) / totalGames).toFixed(1) 
+    const avgRating = games.length > 0 
+        ? (games.reduce((sum, game) => sum + game.rating, 0) / games.length).toFixed(1) 
         : "0.0";
 
     let mostCommonGenre = "N/A";

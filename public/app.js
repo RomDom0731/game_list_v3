@@ -10,7 +10,14 @@ const viewButton = document.getElementById("view-button");
 const listView = document.getElementById("list-view");
 const statsView = document.getElementById("stats-view");
 
+let recordsPerPage = parseInt(getCookie("pageSize")) || 10;
+
 async function init() {
+    const pageSizeSelect = document.getElementById("page-size-select");
+    if (pageSizeSelect) {
+        pageSizeSelect.value = recordsPerPage;
+    }
+    
     await fetchGames();
 }
 
@@ -25,8 +32,6 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-let recordsPerPage = parseInt(getCookie("pageSize")) || 10;
-
 async function fetchGames() {
     try {
         const search = document.getElementById("search-input").value;
@@ -37,9 +42,9 @@ async function fetchGames() {
         if (result && result.data){
             games = result.data; 
             renderList(result.data); 
-            renderStats(games);
+            renderStats(result.data, result.total);
             updatePaginationUI(result.page, result.totalPages);
-            populateGenreDropdown();
+            populateGenreDropdown(result.allGenres);
         }
     } catch (error) {
         console.error("Fetch error:", error);
@@ -65,7 +70,7 @@ function showStats() {
     document.getElementById("pagination-controls").classList.add("hidden");
     statsView.classList.remove("hidden");
     viewButton.textContent = "View Games";
-    renderStats(games); 
+    fetchGames();
 }
 
 function showList() {
@@ -76,12 +81,12 @@ function showList() {
     fetchGames();
 }
 
-function populateGenreDropdown() {
+function populateGenreDropdown(allGenres) {
     const genreSelect = document.getElementById("genre");
     if (!genreSelect) return;
     const uniqueGenres = [...new Set(games.map(game => game.genre))].filter(Boolean).sort();
     genreSelect.innerHTML = '<option value="" disabled selected>Select a genre</option>';
-    uniqueGenres.forEach(genre => {
+    allGenres.sort().forEach(genre => {
         const option = document.createElement("option");
         option.value = genre;
         option.textContent = genre;
@@ -95,6 +100,7 @@ window.updateGame = (id) => {
         document.getElementById("title").value = game.title;
         document.getElementById("genre").value = game.genre;
         document.getElementById("rating").value = game.rating;
+        document.getElementById("image-url").value = game.image_url;
         window.editedGameID = id;
         modal.classList.remove("hidden");
     }
@@ -103,10 +109,8 @@ window.updateGame = (id) => {
 window.deleteGame = async (id) => {
     if (confirm("Confirm deletion?")) {
         await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
-        const totalAfter = games.length - 1;
-        const maxPages = Math.ceil(totalAfter / recordsPerPage);
-        if (currentPage > maxPages && currentPage > 1) {
-            currentPage = maxPages;
+        if (games.length === 1 && currentPage > 1) {
+            currentPage--;
         }
         await fetchGames();
     }
@@ -149,8 +153,10 @@ form.onsubmit = async (e) => {
         body: JSON.stringify(gameData)
     });
     if (!window.editedGameID) {
-        const newTotal = games.length + 1;
-        currentPage = Math.ceil(newTotal / recordsPerPage);
+        await fetchGames(); 
+    } else {
+        window.editedGameID = null;
+        await fetchGames();
     }
     window.editedGameID = null;
     modal.classList.add("hidden");

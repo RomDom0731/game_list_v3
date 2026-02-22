@@ -43,11 +43,15 @@ def get_games():
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
 
+    unique_genres = db.session.query(Game.genre).distinct().all()
+    genres_list = [g[0] for g in unique_genres]
+
     return jsonify({
         "data": [{"id": g.id, "title": g.title, "genre": g.genre, "rating": g.rating, "image_url": g.image_url} for g in pagination.items],
         "total": pagination.total,
         "page": page,
-        "totalPages": pagination.pages
+        "totalPages": pagination.pages,
+        "allGenres": genres_list
     })
 
 @app.route('/api', methods=['POST'])
